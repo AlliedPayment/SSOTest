@@ -1,6 +1,8 @@
-# SSOTest
-Sample .Net Core SSO request test. Demonstrates how to create an authorization header and the proper format of an SSO request.
+# Allied SSO Test
 
+Sample .Net Core SSO request test.
+
+Demonstrates how to create an authorization header and the proper format of an SSO request.
 
 ## Requirements
 - [.Net Core](https://www.microsoft.com/net/core)
