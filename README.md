@@ -8,6 +8,8 @@ Demonstrates how to create an authorization header and SSO request for Allied.
 - Execute `dotnet restore` to restore nuget packages.
 - Execute `dotnet test` to run the test.
 
+## [Source Code](https://github.com/AlliedPayment/SSOTest/blob/master/SSoTest.cs)
+
 ```c#
 using System;
 using System.Collections.Generic;
