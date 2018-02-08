@@ -9,43 +9,43 @@ using Xunit;
 
 namespace SSOTest
 {
-    public class SsoResponse
-    {
-        public string Uri { get; set; }
-    }
     public class SSoTest
     {
-        const string PrivateKey = "PRIVATE_KEY_HERE";
-        const string PublicKey = "PUBLIC_KEY_HERE";
-        const string Domain = "FI_DOMAIN_HERE";
-        const string Root = "https://api.alliedpayment.com";
-        const string Endpoint = "sso";
-        const string JsonMime = "application/json";
-        
+        private const string PrivateKey = "PRIVATE_KEY_HERE";
+        private const string PublicKey = "PUBLIC_KEY_HERE";
+        private const string Domain = "DOMAIN";
+        private const string Root = "https://api.demo.alliedpayment.com";
+        private const string Endpoint = "sso";
+        private const string JsonMime = "application/json";
+        private const string Username = "test.user";
+        private const string ForeignKey = "another.id";
+        private const string Application = "BILLPAY";
+
         [Fact]
         public async void SSO_Request()
         {
             var ssoToken = new
             {
-                Application = "BILLPAY",
-                CustomerId = "test",
-                FinancialInstitutionId = "ALLIED",
-                FirstName = "Support",
+                Application = Application,
+                CustomerId = Username,
+                FinancialInstitutionId = Domain,
+                FirstName = "Test",
                 LastName = "User",
-                Email = "support.user@alliedpayment.com",
-                Timeout = 50,
-                Accounts = new List<object>
+                Email = "test.user@domain.com",
+                Accounts = new Accounts()
                 {
-                    new
+                    Values = new List<Account>()
                     {
-                        AccountCIF = "12345",
-                        AccountNumber = "1234",
-                        AccountName = "My Bank Account",
-                        AvailableAccountBalance = 1000,
-                        CollectedAccountBalance = 1000,
-                        RoutingNumber = "074000010",
-                        AccountOwnerType = "Personal",
-                        AccountType = "Checking"
+                        new Account(){
+                            AccountCif = "12345",
+                            AccountNumber = "1234",
+                            AccountName = "My Bank Account",
+                            AvailableAccountBalance = 1000,
+                            CollectedAccountBalance = 1000,
+                            RoutingNumber = "074000010",
+                            AccountOwnerType = "Personal",
+                            AccountType = "Checking"
+                        }
                     }
                 },
                 Address1 = "3201 Stellhorn Road",
@@ -53,10 +53,10 @@ namespace SSOTest
                 State = "IN",
                 Zip = "46815",
                 DailyLimit = 1000,
-                UserName = "support",
-                ForeignKey = "support"
+                UserName = Username,
+                ForeignKey = ForeignKey
             };
-            
+
             var client = new HttpClient() { BaseAddress = new Uri(Root) };
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JsonMime));
@@ -76,26 +76,26 @@ namespace SSOTest
 
         private string CreateSignature(string url, string timestamp)
         {
-        var message = new StringBuilder();
-        message.Append(url + "\r\n");
-        if (!string.IsNullOrEmpty(timestamp)) message.Append(timestamp + "\r\n");
-        var bytes = Encoding.UTF8.GetBytes(message.ToString());
-        var key = Encoding.UTF8.GetBytes(PrivateKey);
-        var hmac = new HMACSHA1(key);
-        var hash = hmac.ComputeHash(bytes);
-        return Convert.ToBase64String(hash);
+            var message = new StringBuilder();
+            message.Append(url + "\r\n");
+            if (!string.IsNullOrEmpty(timestamp)) message.Append(timestamp + "\r\n");
+            var bytes = Encoding.UTF8.GetBytes(message.ToString());
+            var key = Encoding.UTF8.GetBytes(PrivateKey);
+            var hmac = new HMACSHA1(key);
+            var hash = hmac.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
         }
 
         public string GetAuthorizationHeader(string url, string domain = null, string username = null)
         {
-        var timestamp = DateTime.UtcNow.ToString("o");
-        var signature = CreateSignature(url, timestamp);
-        domain = (domain != null) ? domain : Domain;
-        var header = new StringBuilder("TIMESTAMP ");
-        if (!string.IsNullOrEmpty(username)) header.Append(string.Format("username={0};", username));
-        if (!string.IsNullOrEmpty(domain)) header.Append(string.Format("domain={0};", domain));
-        header.Append(string.Format("timestamp={0};signature={1};publickey={2}", timestamp, signature, PublicKey));
-        return header.ToString();
+            var timestamp = DateTime.UtcNow.ToString("o");
+            var signature = CreateSignature(url, timestamp);
+            domain = (domain != null) ? domain : Domain;
+            var header = new StringBuilder("TIMESTAMP ");
+            if (!string.IsNullOrEmpty(username)) header.Append(string.Format("username={0};", username));
+            if (!string.IsNullOrEmpty(domain)) header.Append(string.Format("domain={0};", domain));
+            header.Append(string.Format("timestamp={0};signature={1};publickey={2}", timestamp, signature, PublicKey));
+            return header.ToString();
         }
     }
 }
